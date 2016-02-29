@@ -1,17 +1,19 @@
-
 import random
+import sqlite3
+
 
 # Pick what to run
 GENERATE_DATA = True
-printCustomer = False
+printCustomer = True
 printItems = True
-printCounters = True
+printCounters = False
 printEmployees = True
 
 # Per category, do not go above 1000
 numOfItems = 1000
 
-numOfCustomers = 10000
+#numOfCustomers = 10000
+numOfCustomers = 10
 numOfEmployees = 50
 
 # Generate a list of random product IDs
@@ -79,6 +81,11 @@ def generateProducts(numOfItems):
         print(IDList)
         print()
 
+
+        for i in range(len(IDList)):
+            c.execute("INSERT INTO Products (ProductID) VALUES (?)", (IDList[i],))
+            conn.commit()
+
     return IDList
 
 
@@ -130,12 +137,11 @@ def generatePurchases(IDList, numOfPurchases, numOfItems, food, medical, electro
                 tempIndex = random.randint(5*numOfItems, 6*numOfItems-1)
             customerPurchases.append(IDList[tempIndex])
 
-    if printCustomer:
-        print(customerPurchases)
-
+    #if printCustomer:
+     #   print(customerPurchases)
+    return customerPurchases
 
 def generateEmployees(numOfEmployees):
-
     # Name
     maleNames = ['Perry Lovan', 'Horacio Arvidson', 'Gale Skipworth', 'Joshua Lodge', 'Noble Shutter', 'Kristopher Talor', 'Jarod Harrop', 'Joan Henrichs', 'Wilber Vitiello', 'Clayton Brannum', 'Joel Sennett', 'Wiley Maffei', 'Clemente Flore', 'Cliff Saari', 'Miquel Plamondon', 'Erwin Broadus', 'Elvin Defibaugh', 'Ramon Vaquera', 'Roberto Koval', 'Micah Sumter', 'Wyatt Cambareri', 'Jamal Delarosa', 'Franklyn Hayles', 'Riley Haslett', 'Robt Fincher', 'Abraham Denzer', 'Darius Jude', 'Phillip Sunderman', 'August Kindel', 'Jospeh Mawson', 'Damion Postma', 'Gregorio Pasco', 'Rosendo Downing', 'Chance Plascencia', 'Jewell Pankratz', 'Jerrell Tarrance', 'Michal Bliss', 'Josue Larocque', 'Aaron Harpster', 'Zack Hildebrant', 'Frank Souders', 'Lindsay Bechard', 'Agustin Marks', 'Mathew Fredericksen', 'Ivan Hanline', 'Michael Otto', 'Max Oberlander', 'Ricky Mckellar', 'Bernard Friedt', 'King Lorentzen']
     femaleNames = ['Lorretta Vansickle', 'Loura Steimle', 'Neomi Fritz', 'Vernie Vanderveen', 'Dede Poehler', 'Margarete Espinoza', 'Leda Leonardo', 'Fae Strand', 'Nichol Winford', 'Danika Ridgeway', 'Elvira Balentine', 'Sharell Xie', 'Sheree Booker', 'Emely Conine', 'Justina Kleve', 'Pia Maxton', 'Sophia Lark', 'Nilsa Albee', 'Felipa Seman', 'Jeraldine Watkins', 'Susann Sowards', 'Asha Irion', 'Shay Koran', 'Rosio Jahn', 'Rachal Slaven', 'Beryl Byron', 'Jona Lira', 'Margert Strite', 'Talia Beauregard', 'Jacqueline Vella', 'Rolande Mccready', 'Margret Hickerson', 'Precious Confer', 'Evita Nicolai', 'Fredda Groner', 'Laquanda Bracken', 'Alana Saddler', 'Melania Harring', 'Shae Everette', 'Marlyn Mcfalls', 'Madeline Nicols', 'Fonda Webster', 'Fumiko Steffy', 'Virginia Sprinkle', 'Lula Frisch', 'Mari Mulherin', 'Alecia Remillard', 'Jeanna Halderman', 'Ocie Waldrep', 'Theresa Knouse']
@@ -163,7 +169,10 @@ def generateEmployees(numOfEmployees):
             print("Clock in:", clockIn)
             print("Clock out:", clockOut)
             print("Wage:", wage)
+            c.execute("INSERT INTO Employee (Name, ClockIn, ClockOut, Wage) VALUES (?, ?, ?, ?)",
+                      (name, clockIn, clockOut, wage))
 
+            conn.commit()
         # Database.update clock in
         # Database.update clock out
         # Database.update wage
@@ -285,13 +294,6 @@ def generateCustomers(numOfCustomers):
 
         customer = random.choice(randomType)
 
-        if printCustomer:
-            print("\nAge: ", age)
-            print("Gender: ", gender)
-            print("Hour :", hour)
-            print("Type :", customer)
-            print("Purchases :", end="")
-
         if customer == 'Grocery Shopper':
             shoppers += 1
             numOfPurchases = random.randint(0, 50)
@@ -301,7 +303,9 @@ def generateCustomers(numOfCustomers):
             outdoorsChance = 1
             clothingChance = 1
             beautyChance = 2
-            allCustomers[customerID] = [age, gender, hour, customer, generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)]
+            temp = generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)
+            allCustomers[customerID] = [age, gender, hour, customer, temp]
+
 
         elif customer == 'Supermodel':
             models += 1
@@ -312,7 +316,9 @@ def generateCustomers(numOfCustomers):
             outdoorsChance = 0
             clothingChance = 10
             beautyChance = 13
-            allCustomers[customerID] = [age, gender, hour, customer, generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)]
+            temp = generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)
+            allCustomers[customerID] = [age, gender, hour, customer, temp]
+
 
         elif customer == 'Hippie':
             hippie += 1
@@ -323,7 +329,9 @@ def generateCustomers(numOfCustomers):
             outdoorsChance = 14
             clothingChance = 7
             beautyChance = 1
-            allCustomers[customerID] = [age, gender, hour, customer, generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)]
+            temp = generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)
+            allCustomers[customerID] = [age, gender, hour, customer, temp]
+            #print(temp)
 
         elif customer == 'Old Lady':
             oldl += 1
@@ -334,7 +342,9 @@ def generateCustomers(numOfCustomers):
             outdoorsChance = 0
             clothingChance = 3
             beautyChance = 10
-            allCustomers[customerID] = [age, gender, hour, customer, generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)]
+            temp = generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)
+            allCustomers[customerID] = [age, gender, hour, customer, temp]
+            #print(temp)
 
         elif customer == 'Nerd':
             nerd += 1
@@ -345,7 +355,9 @@ def generateCustomers(numOfCustomers):
             outdoorsChance = 0
             clothingChance = 2
             beautyChance = 1
-            allCustomers[customerID] = [age, gender, hour, customer, generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)]
+            temp = generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)
+            allCustomers[customerID] = [age, gender, hour, customer, temp]
+            #print(temp)
 
         elif customer == 'Self Doctor':
             doctor += 1
@@ -356,7 +368,9 @@ def generateCustomers(numOfCustomers):
             outdoorsChance = 1
             clothingChance = 2
             beautyChance = 1
-            allCustomers[customerID] = [age, gender, hour, customer, generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)]
+            temp = generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)
+            allCustomers[customerID] = [age, gender, hour, customer, temp]
+            #print(temp)
 
         elif customer == 'Nudist':
             nudist += 1
@@ -367,7 +381,9 @@ def generateCustomers(numOfCustomers):
             outdoorsChance = 14
             clothingChance = 0
             beautyChance = 0
-            allCustomers[customerID] = [age, gender, hour, customer, generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)]
+            temp = generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)
+            allCustomers[customerID] = [age, gender, hour, customer, temp]
+            #print(temp)
 
         elif customer == 'Old Fart':
             oldf += 1
@@ -378,7 +394,19 @@ def generateCustomers(numOfCustomers):
             outdoorsChance = 3
             clothingChance = 3
             beautyChance = 0
-            allCustomers[customerID] = [age, gender, hour, customer, generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)]
+            temp = generatePurchases(completeIDList, numOfPurchases, numOfItems, foodChance, medicalChance, electronicsChance, outdoorsChance, clothingChance, beautyChance, customer)
+            allCustomers[customerID] = [age, gender, hour, customer, temp]
+            #print(temp)
+
+        if printCustomer:
+            itemsBought = (", ".join(repr(e) for e in temp))
+
+            #print(itemsBought)
+
+            c.execute("INSERT INTO Customer (CustomerID, Hour, Age, Gender, Items) VALUES (?, ?, ?, ?, ?)",
+                      (customerID, hour, age, gender, itemsBought))
+
+            conn.commit()
 
     if printCounters:
         print("\nShoppers:", shoppers)
@@ -393,13 +421,24 @@ def generateCustomers(numOfCustomers):
     if printCustomer:
         print("\nRaw Customer Data: ")
         print(allCustomers)
+        itemsBought = (", ".join(repr(e) for e in temp))
+
+        #print(itemsBought)
+
+        c.execute("INSERT INTO Customer (CustomerID, Hour, Age, Gender, Items) VALUES (?, ?, ?, ?, ?)",
+                  (customerID, hour, age, gender, itemsBought))
+
+        conn.commit()
 
     return allCustomers
 
 # Run app
 if GENERATE_DATA:
+    conn = sqlite3.connect('Test.db')
+    c = conn.cursor()
     completeIDList = generateProducts(numOfItems)
     generateEmployees(numOfEmployees)
     generateCustomers(numOfCustomers)
-
+    c.close()
+    conn.close()
 
