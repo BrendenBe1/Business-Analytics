@@ -1,35 +1,68 @@
-__author__ = 'Brenden'
 import sqlite3
 
-conn = sqlite3.connect('DataAnalysis.db')
-c = conn.cursor()
+####################################################################
+# Holds functions to return different fields from the database     #
+# Used for data analysis                                           #
+# Needs to return values now                                       #
+####################################################################
 
 
-def read_from_db():
-    #c.execute('SELECT * FROM Employee')  # selects everything
-    #c.execute('SELECT * FROM Employee WHERE ClockIn=19') # selects only the places where clockin == 19
-    c.execute('SELECT * FROM Employee WHERE ClockIn=19 AND Wage=12') # selects only places with 2 conditions
-    # print it all raw
-    #data = c.fetchall()
-    #print(data)
+class retrieveData:
+    def __init__(self):
+        self.conn = sqlite3.connect('DataAnalysis.db')
+        self.c = self.conn.cursor()
 
-    # print each row
-    for row in c.fetchall():
-        print(row)
+    def get_employee_data(self, name, clockin, clockout, wage):
+        evaluation = [0]
+        if name:
+            evaluation.append("Name")
 
-    print('--------------------------')
+        if clockin:
+            evaluation.append("ClockIn")
 
-    c.execute('SELECT * FROM Customer WHERE Gender="M" AND Hour=21 AND Age=21 ')
-    for row in c.fetchall():
-        print(row)
+        if clockout:
+            evaluation.append("ClockOut")
 
-    print('--------------------------')
+        if wage:
+            evaluation.append("Wage")
 
-    c.execute('SELECT * FROM Products WHERE ProductID < 10500 ')
-    for row in c.fetchall():
-        print(row)
+        # make list into comma seperated string for use in database calls
+        x = ','.join(map(str, evaluation[1:]))
 
+        self.c.execute("SELECT "+x+" FROM Employee")
+        for row in self.c.fetchall():
+                print(row)
 
-read_from_db()
-c.close()
-conn.close()
+    def get_customer_data(self, customerid, hour, age, gender, items):
+       newlist = [0]
+       if customerid:
+           newlist.append("CustomerID")
+
+       if hour:
+           newlist.append("Hour")
+
+       if age:
+           newlist.append("Age")
+
+       if gender:
+           newlist.append("Gender")
+
+       if items:
+           newlist.append("Items")
+
+       y = ','.join(map(str, newlist[1:]))
+
+       self.c.execute("SELECT "+y+" FROM Customer")
+       for row in self.c.fetchall():
+           print(row)
+
+    def get_product_data(self, productid):
+        if productid:
+            self.c.execute("Select ProductID FROM Products")
+            for row in self.c.fetchall():
+                print(row)
+
+get_some_data = retrieveData()
+get_some_data.get_employee_data(1, 1, 1, 0)
+#get_some_data.get_customer_data(1, 1, 1, 1, 0)
+#get_some_data.get_product_data(1)
