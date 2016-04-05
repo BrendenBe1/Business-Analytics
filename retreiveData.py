@@ -12,6 +12,8 @@ class retrieveData:
         self.conn = sqlite3.connect('DataAnalysis.db')
         self.c = self.conn.cursor()
 
+    # enter 1 for parameters you want to get data for and 0 for the ones you dont want
+    # ex: if you only want clockin and clockout time call get_employee_data(0,1,1,0)
     def get_employee_data(self, name, clockin, clockout, wage):
         evaluation = [0]
         if name:
