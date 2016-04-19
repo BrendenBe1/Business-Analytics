@@ -8,8 +8,8 @@ class GUI:
         # Generate window
         self.root = Tk()
         self.root.title("Generate Graphs")
-        self.root.maxsize(200, 400)
-        self.root.minsize(200, 400)
+        self.root.maxsize(160, 400)
+        self.root.minsize(160, 400)
 
         # ttk styles
         self.green_button = ttk.Style()
@@ -29,12 +29,12 @@ class GUI:
         self.date_type = IntVar()
 
         # Entry variables
-        self.date_text = "MM-DD-YY"
+        self.date_text = StringVar()
 
         # Checkboxes
         self.graph_label = Label(self.root, text="Graph selection:", pady=10).pack(anchor=W)
         self.graph_0 = ttk.Checkbutton(self.root, text="Employee information", variable=self.a, width=200, style="TCheckbutton").pack(anchor=W)
-        self.graph_1 = ttk.Checkbutton(self.root, text="Number of customers per hour", variable=self.b, width=200).pack(anchor=W)
+        self.graph_1 = ttk.Checkbutton(self.root, text="# of customers per hour", variable=self.b, width=200).pack(anchor=W)
         self.graph_2 = ttk.Checkbutton(self.root, text="Daily customer statistics", variable=self.c, width=200).pack(anchor=W)
         self.graph_3 = ttk.Checkbutton(self.root, text="Revenue", variable=self.d, width=200).pack(anchor=W)
         self.graph_4 = ttk.Checkbutton(self.root, text="Items sold", variable=self.e, width=200).pack(anchor=W)
@@ -45,10 +45,10 @@ class GUI:
         self.daily_button = ttk.Radiobutton(self.root, text="Day", variable=self.date_type, value = 1).pack(anchor=W)
         self.weekly_button = ttk.Radiobutton(self.root, text="Week", variable=self.date_type, value = 2).pack(anchor=W)
         self.monthly_button = ttk.Radiobutton(self.root, text="Month", variable=self.date_type, value = 3).pack(anchor=W)
-        self.year_button = ttk.Radiobutton(self.root, text="Year", variable=self.date_type, value = 4).pack(anchor=W)
+        self.year_button = ttk.Radiobutton(self.root, text="Current year", variable=self.date_type, value = 4).pack(anchor=W)
 
         # Entry
-        self.date_label = Label(self.root, text="Date (MM-DD-YY):", pady=10).pack(anchor=W)
+        self.date_label = Label(self.root, text="Date (MM-DD):", pady=10).pack(anchor=W)
         self.date_entry = ttk.Entry(self.root, textvariable=self.date_text).pack(anchor=W)
 
         # Blank label
@@ -72,6 +72,25 @@ class GUI:
                 print(graph, end=' ')
         print("\n> Generating graphs, please wait")
 
+        # Parameters
+        date = self.date_text.get()
+        date_type = self.date_type.get() # 1, 2, 3, 4 = day, week, month, year
+        # self.selected (graphs are 0-5)
+
+        # No date provided
+        if not date:
+
+            # Year was selected
+            if date_type == 4:
+                pass
+
+            # Close
+            else:
+                print("> ERROR: Please enter a date if you did not select current year")
+                print("-----------------------------------------")
+                self.root.destroy()
+                return
+
         #TODO: Call dataAnalysis on selected graphs and pass in selected widgets + date as parameters
 
         # Close GUI after creation
@@ -81,4 +100,4 @@ class GUI:
     def get_graphs(self):
         return self.selected
 
-app = GUI()
+# app = GUI()
