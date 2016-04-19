@@ -1,4 +1,7 @@
 import sqlite3
+import retrieveData
+import plotly.plotly as py
+from plotly.graph_objs import *
 
 ####################################
 # Grabs data from every field      #
@@ -6,15 +9,63 @@ import sqlite3
 # Stores data in a second database #
 ####################################
 
+#TODO:
+# Grab data from GUI
+# Pass data into parameters
+# Translate data into needed database parameters
+# Grab respective data from databases
+# Analyze
+# Graph to dashboard(?)
 
 class dataAnalysis:
-    def __init__(self, database):
+    def __init__(self):
         print("\n------------| DATA ANALYSIS |------------\n")
-        self.database_name = database.database_name
-        self.conn = sqlite3.connect(self.database_name)
-        self.c = self.conn.cursor()
-        print("> Successfully connected to", self.database_name)
+        self.database = retrieveData.retrieveData()
+      #  print("> Successfully connected to", self.database_name)
         print("> Pending...")
+       # self.employee_hours()
+
+    def employee_hours(self):
+
+        # Grab dictionary
+  #      self.database.get_employee_data(1, 1, 1, 0)
+
+        # Analyze information + store into new data struct
+
+        # Generate data points with above data struct
+        graph_list = []
+        employees = {"Zach Kramer" : 50, "Matt Kramer" : 60, "Spencer Cote" : 13}
+        for data in employees:
+            tmp = Bar(x=data, y=employees[data], name=data)
+            graph_list.append(tmp)
+
+
+        # Make graph
+        graph_data = Data(graph_list)
+        graph_layout = Layout(barmode='stack')
+        graph_fig = Figure(data=graph_data, layout=graph_layout)
+        graph_uniqueURL = py.plot(graph_fig, filename='Employee-Hours')
+
+
+
+    def employee_pay(self):
+        # self.database.get_employee_data
+
+        graph_list = []
+        employees = {}
+        for data in employees:
+            tmp = Bar(x=data, y=employees[data], name=data)
+            graph_list.append(tmp)
+
+        graph_data = Data(graph_list)
+        graph_layout = Layout(barmode='stack')
+        graph_fig = Figure(data=graph_data, layout=graph_layout)
+        graph_uniqueURL = py.plot(graph_fig, filename='Employee-Pay')
+
+
+
+
+
 
     # Fields to analyze
 
@@ -50,3 +101,6 @@ class dataAnalysis:
         # DATA: PRODUCTS ALL
         # Certain time period
         # Relationships between time periods, revenue, and loss
+
+test = dataAnalysis()
+test.employee_hours()
