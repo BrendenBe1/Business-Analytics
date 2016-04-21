@@ -1,5 +1,6 @@
 __author__ = 'Brenden'
 import sqlite3
+import pprint
 
 ####################################################################
 # Holds functions to return different fields from the database     #
@@ -14,9 +15,14 @@ import sqlite3
 # Employee, Customer, Product: just enter 1 or 0 for each. 1 means you want data 0 means no data
 # as of now it just returns all of the data from the table but could be made to return only certain col's
 class retrieveData:
-    def __init__(self, startDate, endDate, Employee, Customer, Product):
+    def __init__(self, date_range, employee, customer, product):
         # list for looping
         days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+        startDate = date_range[0]
+        endDate = date_range[1]
+        print(startDate)
+        print(endDate)
         # first to indices of input are month
         # this is why entries must be 2 digits for day and month
         startMonth = (startDate[0] + startDate[1])
@@ -35,63 +41,73 @@ class retrieveData:
             endMonth = endMonth[1]
 
         # list to store all the data returned
-        all_data = []
+        all_data = {}
+        final_data = {}
 
         # loop for only going thru 1 month
         if(int(startMonth) == int(endMonth)):
             for i in range(int(startDay), int(endDay) + 1):
-                #print(startMonth + "-" + str(i) + "-" + "2018.db")
+                temp_name = (startMonth + "-" + str(i) + "-" + "2018")
                 tempDB = (startMonth + "-" + str(i) + "-" + "2018.db")
                 self.conn = sqlite3.connect(tempDB)
                 self.c = self.conn.cursor()
-                if(Employee == 1):
-                   all_data.append(self.get_employee_data())
-                if(Customer == 1):
-                    all_data.append(self.get_customer_data())
-                if(Product == 1):
-                    all_data.append(self.get_product_data())
+                if(employee == 1):
+                   all_data['Employee'] = self.get_employee_data()
+                if(customer == 1):
+                    all_data['Customer'] = self.get_customer_data()
+                if(product == 1):
+                    all_data['Product'] = self.get_product_data()
+                final_data[temp_name] = all_data
 
         # loop for multiple months
         else:
             for i in range(int(startDay), days_in_month[(int(startMonth) - 1)] + 1):
                 tempDB = (startMonth + "-" + str(i) + "-" + "2018.db")
+                temp_name = (startMonth + "-" + str(i) + "-" + "2018")
                 self.conn = sqlite3.connect(tempDB)
                 self.c = self.conn.cursor()
-                if(Employee == 1):
-                    all_data.append(self.get_employee_data())
-                if(Customer == 1):
-                    all_data.append(self.get_customer_data())
-                if(Product == 1):
-                    all_data.append(self.get_product_data())
+                if(employee == 1):
+                   all_data['Employee'] = self.get_employee_data()
+                if(customer == 1):
+                    all_data['Customer'] = self.get_customer_data()
+                if(product == 1):
+                    all_data['Product'] = self.get_product_data()
+                final_data[temp_name] = all_data
 
             for a in range(int(startMonth) + 1, int(endMonth) + 1):
 
                 if(a == int(endMonth)):
                     for j in range(1, int(endDay) + 1):
                         tempDB = (endMonth + "-" + str(j) + "-" + "2018.db")
+                        temp_name = (endMonth + "-" + str(j) + "-" + "2018")
                         self.conn = sqlite3.connect(tempDB)
                         self.c = self.conn.cursor()
-                        if(Employee == 1):
-                            all_data.append(self.get_employee_data())
-                        if(Customer == 1):
-                            all_data.append(self.get_customer_data())
-                        if(Product == 1):
-                            all_data.append(self.get_product_data())
+                        if(employee == 1):
+                           all_data['Employee'] = self.get_employee_data()
+                        if(customer == 1):
+                            all_data['Customer'] = self.get_customer_data()
+                        if(product == 1):
+                            all_data['Product'] = self.get_product_data()
+                        final_data[temp_name] = all_data
 
 
                 else:
                     for k in range(1, days_in_month[(a - 1)] + 1):
                         tempDB = (str(a) + "-" + str(k) + "-" + "2018.db")
+                        temp_name = (str(a) + "-" + str(k) + "-" + "2018")
                         self.conn = sqlite3.connect(tempDB)
                         self.c = self.conn.cursor()
-                        if(Employee == 1):
-                            all_data.append(self.get_employee_data())
-                        if(Customer == 1):
-                            all_data.append(self.get_customer_data())
-                        if(Product == 1):
-                            all_data.append(self.get_product_data())
+                        if(employee == 1):
+                           all_data['Employee'] = self.get_employee_data()
+                        if(customer == 1):
+                            all_data['Customer'] = self.get_customer_data()
+                        if(product == 1):
+                            all_data['Product'] = self.get_product_data()
+                        final_data[temp_name] = all_data
         # print the data
-        print(all_data)
+        #print(all_data)
+        #print(final_data)
+        pprint.pprint(final_data)
 
 
 
@@ -162,11 +178,11 @@ class retrieveData:
         #self.c.execute("SELECT " + list_to_retrieve + " FROM Products")
         self.c.execute("SELECT * FROM Products")
         for row in self.c.fetchall():
-            print(row)
+            #print(row)
             productlist.append(row)
         return productlist
 
-#get_some_data = retrieveData("01-31-2018", "02-18-2018", 1, 0, 0)
+get_some_data = retrieveData(["01-30-2018", "02-03-2018"], 0, 0, 0)
 #get_some_data.get_employee_data()
 #get_some_data.get_customer_data(1, 1, 1, 1, 0)
 #get_some_data.get_product_data(1,1)
