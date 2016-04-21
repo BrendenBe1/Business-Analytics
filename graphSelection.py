@@ -1,6 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 import datetime
+import dataAnalysis
+import createDashboard
 
 class GUI:
     def __init__(self):
@@ -9,12 +11,11 @@ class GUI:
         # Generate window
         self.root = Tk()
         self.root.title("Generate Graphs")
-        self.root.maxsize(160, 380)
-        self.root.minsize(160, 380)
+        self.root.maxsize(160, 300)
+        self.root.minsize(160, 300)
 
         # Variables
         self.current_year = str(datetime.datetime.now().year)
-
 
         # ttk styles
         self.green_button = ttk.Style()
@@ -30,11 +31,9 @@ class GUI:
         self.graphs = [self.a, self.b, self.c, self.d, self.e, self.f]
         self.selected = []
 
-        # Radiobutton variable
-        self.date_type = IntVar()
-
         # Entry variables
         self.date_text = StringVar()
+        self.date_text2 = StringVar()
 
         # Checkboxes
         graph_photo = PhotoImage(file="selection.gif")
@@ -46,18 +45,11 @@ class GUI:
         self.graph_4 = ttk.Checkbutton(self.root, text="Items sold", variable=self.e, width=200).pack()
         self.graph_5 = ttk.Checkbutton(self.root, text="Extra statistics", variable=self.f, width=200).pack()
 
-        # Radiobuttons
-        radio_photo = PhotoImage(file="time.gif")
-        self.radio_label = Label(self.root, image=radio_photo, pady=10).pack(anchor=W)
-        self.daily_button = ttk.Radiobutton(self.root, text="Day", variable=self.date_type, value = 1).pack()
-        self.weekly_button = ttk.Radiobutton(self.root, text="Week", variable=self.date_type, value = 2).pack()
-        self.monthly_button = ttk.Radiobutton(self.root, text="Month", variable=self.date_type, value = 3).pack()
-        self.year_button = ttk.Radiobutton(self.root, text="Current year", variable=self.date_type, value = 4).pack()
-
-        # Entry
+        # Entries
         self.date_photo = PhotoImage(file="date.gif")
         self.date_label = Label(self.root, image=self.date_photo, pady=10).pack()
         self.date_entry = ttk.Entry(self.root, textvariable=self.date_text).pack()
+        self.date_entry2 = ttk.Entry(self.root, textvariable=self.date_text2).pack()
 
         # Blank label
         self.empty_label = Label(self.root, text="").pack()
@@ -76,43 +68,28 @@ class GUI:
     def input_check(self):
         # Parameters
         date = self.date_text.get()
-        date_type = self.date_type.get() # 1, 2, 3, 4 = day, week, month, year
-        # self.selected (graphs are 0-5)
+        date2 = self.date_text2.get()
 
         # No date provided
-        if not date:
-
-            # Year was selected
-            if date_type == 4:
-                pass
-
-            # Close
-            else:
-                print("> ERROR: Please enter a date if you did not select current year")
-                print("-----------------------------------------")
-                self.root.destroy()
-                return
+        if not (date and date2):
+            print("> ERROR: Please enter dates")
+            print("-----------------------------------------")
+            self.root.destroy()
+            return
 
         # Incorrect date format
         try:
-            if date[2] != "-":
-                print("> ERROR: Please enter the date in the correct format")
+            if date[2] != "-" or date2[2] != "-":
+                print("> ERROR: Please enter the dates in the correct format")
                 print("-----------------------------------------")
                 self.root.destroy()
                 return
 
         except IndexError:
-                print("> ERROR: Please enter a full date in the correct format")
+                print("> ERROR: Please enter a full dates in the correct format")
                 print("-----------------------------------------")
                 self.root.destroy()
                 return
-
-        # Date type not selected
-        if date_type not in [1,2,3,4]:
-            print("> ERROR: Please select a date type")
-            print("-----------------------------------------")
-            self.root.destroy()
-            return
 
         # No graphs selected
         if (self.a.get() or self.b.get() or self.c.get() or self.d.get() or self.e.get() or self.f.get()) == 0:
@@ -132,9 +109,20 @@ class GUI:
         else:
             day = date[3]+date[4]
 
+        if date2[0] == 0:
+            month2 = date2[1]
+        else:
+            month2 = date2[0]+date2[1]
+
+        if date[3] == 0:
+            day2 = date2[4]
+        else:
+            day2 = date2[3]+date2[4]
+
         # Invalid date
         try:
             datetime.datetime(year=int(self.current_year),month=int(month),day=int(day))
+            datetime.datetime(year=int(self.current_year),month=int(month2),day=int(day2))
         except ValueError:
             print("> ERROR: Please enter a valid date")
             self.root.destroy()
@@ -152,65 +140,31 @@ class GUI:
 
     def analyze_data(self, date_range):
 
-        print("\n> Analyzing data, please wait")
+        print("\n> Analyzing data and generating graphs, please wait")
 
-        self.convert_date()
+        # Create the dashboard using the graph_URLs from dataAnalysis, the first date, and the name of date type
+        createDashboard.createDashboard(dataAnalysis.dataAnalysis(date_range).employee_hours(), date_range)
 
-        print("\n> Generating graphs, please wait")
-
-
-        #TODO: Call dataAnalysis on selected graphs and pass in selected widgets + date as parameters
+        # TODO: pass in the graph selections and call dataAnalysis on each
 
         # Close GUI after creation
         self.root.destroy()
         return
 
-    # MM-DD to [MM-DD-YY, MM-DD-YY]
+
+    # MM-DD, MM-DD to [MM-DD-YY, MM-DD-YY]
     def convert_date(self):
         date_range = []
-        date = ''
-
-        # Day
-        if self.date_type.get() == 1:
-            date += self.date_text.get()
-            date += "-"
-            date += self.current_year
-            date_range.append(date)
-            date_range.append(date)
-
-        # Week
-        elif self.date_type.get() == 2:
-            date += self.date_text.get()
-            date += "-"
-            date += self.current_year
-            date_range.append(date)
-            date = ''
-
-        # Month
-        elif self.date_type.get() == 3:
-            date += self.date_text.get()
-            date += "-"
-            date += self.current_year
-            date_range.append(date)
-
-        # Year
-        elif self.date_type.get() == 4:
-            date += self.date_text.get()
-            date += "-"
-            date += self.current_year
-            date_range.append(date)
+        date = self.date_text.get()
+        date2 = self.date_text2.get()
+        date += "-"
+        date += self.current_year
+        date2 += "-"
+        date2 += self.current_year
+        date_range.append(date)
+        date_range.append(date2)
 
         return date_range
-
-
-    # Generate links and call the dashboard
-    def generate_graphs(self):
-        graph_url = ''
-
-
-    # Returns list of selected graphs
-    def get_graphs(self):
-        return self.selected
 
 
 app = GUI()
