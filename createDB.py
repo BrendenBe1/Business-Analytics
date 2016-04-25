@@ -1,3 +1,4 @@
+__author__ = 'Brenden'
 import sqlite3
 
 ############################################################
@@ -10,9 +11,10 @@ import sqlite3
 class createDB:
 
     # Constructor creates the initial database and calls respective functions to create the tables and close the DB
-    def __init__(self):
+    def __init__(self, databaseName):
         print("\n------------| DATABASE CREATION |------------\n")
-        self.database_name = 'BUSINESS_DATA.db'
+        #self.database_name = 'BUSINESS_DATA.db'
+        self.database_name = databaseName
         self.conn = sqlite3.connect(self.database_name)  # Create DB
         self.c = self.conn.cursor()  # Variable to access DB
         print("> Database", self.database_name, "was created successfully")
@@ -32,3 +34,4 @@ class createDB:
         self.conn.close()
         print(">", self.database_name, "is now closed")
         print("\n---------------------------------------------\n")
+
