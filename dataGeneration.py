@@ -1,16 +1,12 @@
+__author__ = 'Brenden'
 import random
 import sqlite3
-
-# TODO:
-# Fix the database entering NULL every other entry (generateProducts)
-# Change old syntax from a list to dict (ID_DICT, some already changed)
-    # ie, self.ID_DICT.append(product) --> self.ID_DICT[product] = price
 
 class dataGeneration:
 
     def __init__(self, database):
-        self.num_of_items = 10 # Has to be a 1 followed by 0's
-        self.num_of_customers = 1000
+        self.num_of_items = 100 # Has to be a 1 followed by 0's
+        self.num_of_customers = 200
         self.num_of_employees = 50
         self.GENERATE_DATA = True
         self.print_customers = False
@@ -47,25 +43,23 @@ class dataGeneration:
 
         # Creates X number of items in each category
         for i in range(self.num_of_items):
-            self.ID_DICT[i+self.num_of_items] = random.randint(0, 10) # 1X
-            self.ID_DICT[i+self.num_of_items*2] = random.randint(0, 10)
-            self.ID_DICT[i+self.num_of_items*3] = random.randint(0, 10)
-            self.ID_DICT[i+self.num_of_items*4] = random.randint(0, 10)
-            self.ID_DICT[i+self.num_of_items*5] = random.randint(0, 10)
-            self.ID_DICT[i+self.num_of_items*6] = random.randint(0, 10)
+            self.ID_DICT[i+self.num_of_items] = random.randint(1, 10) # 1X
+            self.ID_DICT[i+self.num_of_items*2] = random.randint(1, 10)
+            self.ID_DICT[i+self.num_of_items*3] = random.randint(1, 10)
+            self.ID_DICT[i+self.num_of_items*4] = random.randint(1, 10)
+            self.ID_DICT[i+self.num_of_items*5] = random.randint(1, 10)
+            self.ID_DICT[i+self.num_of_items*6] = random.randint(1, 10)
 
 
         # Sort for easy selection
         sorted(self.ID_DICT)
+        #print(self.ID_DICT)
 
-        for product in self.ID_DICT:
-            print(product)
+        for product in self.ID_DICT.keys():
+
             temp_int = self.ID_DICT[product]
-            print(temp_int)
-
-            # CURRENTLY EVERY OTHER FIELD IS NULL
-            self.c.execute("INSERT INTO Products (ProductID) VALUES (?)", (product,))
-     #       self.c.execute("INSERT INTO Products (Price) VALUES (?)", (temp_int,))
+            #print("The product ID is: " + str(product) + " and the price is: " + str(self.ID_DICT[product]))
+            self.c.execute("INSERT INTO Products (ProductID, Price) VALUES (?, ?)", (product, self.ID_DICT[product]))
             self.conn.commit()
 
         if self.print_items:
@@ -90,27 +84,27 @@ class dataGeneration:
             if choice == 'Food':
 
                 tempIndex = random.randint(self.num_of_items, self.num_of_items*2-1)
-                self.customer_purchases.append(self.ID_DICT[tempIndex])
+                self.customer_purchases.append(tempIndex)
 
             elif choice == 'Medical':
                 tempIndex = random.randint(self.num_of_items*2, self.num_of_items*3-1)
-                self.customer_purchases.append(self.ID_DICT[tempIndex])
+                self.customer_purchases.append(tempIndex)
 
             elif choice == 'Electronics':
                 tempIndex = random.randint(2*self.num_of_items, 3*self.num_of_items-1)
-                self.customer_purchases.append(self.ID_DICT[tempIndex])
+                self.customer_purchases.append(tempIndex)
 
             elif choice == 'Outdoors':
                 tempIndex = random.randint(3*self.num_of_items, 4*self.num_of_items-1)
-                self.customer_purchases.append(self.ID_DICT[tempIndex])
+                self.customer_purchases.append(tempIndex)
 
             elif choice == 'Clothing':
                 tempIndex = random.randint(4*self.num_of_items, 5*self.num_of_items-1)
-                self.customer_purchases.append(self.ID_DICT[tempIndex])
+                self.customer_purchases.append(tempIndex)
 
             elif choice == 'Beauty':
                 tempIndex = random.randint(5*self.num_of_items, 6*self.num_of_items-1)
-                self.customer_purchases.append(self.ID_DICT[tempIndex])
+                self.customer_purchases.append(tempIndex)
 
         if self.print_customers:
             print(self.customer_purchases)
@@ -380,3 +374,6 @@ class dataGeneration:
         if self.print_customers:
             print("\nRaw Customer Data: ")
             print(self.all_customers)
+
+#testrun = dataGeneration("BUSINESS_DATA.db")
+#testrun.generateProducts()
