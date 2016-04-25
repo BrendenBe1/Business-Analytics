@@ -104,10 +104,10 @@ class retrieveData:
                         if(product == 1):
                             all_data['Product'] = self.get_product_data()
                         final_data[temp_name] = all_data
-        # print the data
-        #print(all_data)
-        #print(final_data)
-        pprint.pprint(final_data)
+
+        #pprint.pprint(final_data)
+        self.return_data(final_data)
+
 
 
 
@@ -182,7 +182,13 @@ class retrieveData:
             productlist.append(row)
         return productlist
 
-get_some_data = retrieveData(["01-30-2018", "02-03-2018"], 0, 0, 0)
+    def return_data(self, data):
+        everything = data
+        #pprint.pprint(everything)
+        return everything
+
+
+get_some_data = retrieveData(["01-11-2018", "01-11-2018"], 1, 0, 0)
 #get_some_data.get_employee_data()
 #get_some_data.get_customer_data(1, 1, 1, 1, 0)
 #get_some_data.get_product_data(1,1)
