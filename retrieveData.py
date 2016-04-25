@@ -47,8 +47,8 @@ class retrieveData:
         # loop for only going thru 1 month
         if(int(startMonth) == int(endMonth)):
             for i in range(int(startDay), int(endDay) + 1):
-                temp_name = (startMonth + "-" + str(i) + "-" + "2016")
-                tempDB = (startMonth + "-" + str(i) + "-" + "2016.db")
+                temp_name = (startMonth + "-" + str(i) + "-" + "2018")
+                tempDB = (startMonth + "-" + str(i) + "-" + "2018.db")
                 self.conn = sqlite3.connect(tempDB)
                 self.c = self.conn.cursor()
                 if(employee == 1):
@@ -62,8 +62,8 @@ class retrieveData:
         # loop for multiple months
         else:
             for i in range(int(startDay), days_in_month[(int(startMonth) - 1)] + 1):
-                tempDB = (startMonth + "-" + str(i) + "-" + "2016.db")
-                temp_name = (startMonth + "-" + str(i) + "-" + "2016")
+                tempDB = (startMonth + "-" + str(i) + "-" + "2018.db")
+                temp_name = (startMonth + "-" + str(i) + "-" + "2018")
                 self.conn = sqlite3.connect(tempDB)
                 self.c = self.conn.cursor()
                 if(employee == 1):
@@ -78,8 +78,8 @@ class retrieveData:
 
                 if(a == int(endMonth)):
                     for j in range(1, int(endDay) + 1):
-                        tempDB = (endMonth + "-" + str(j) + "-" + "2016.db")
-                        temp_name = (endMonth + "-" + str(j) + "-" + "2016")
+                        tempDB = (endMonth + "-" + str(j) + "-" + "2018.db")
+                        temp_name = (endMonth + "-" + str(j) + "-" + "2018")
                         self.conn = sqlite3.connect(tempDB)
                         self.c = self.conn.cursor()
                         if(employee == 1):
@@ -93,8 +93,8 @@ class retrieveData:
 
                 else:
                     for k in range(1, days_in_month[(a - 1)] + 1):
-                        tempDB = (str(a) + "-" + str(k) + "-" + "2016.db")
-                        temp_name = (str(a) + "-" + str(k) + "-" + "2016")
+                        tempDB = (str(a) + "-" + str(k) + "-" + "2018.db")
+                        temp_name = (str(a) + "-" + str(k) + "-" + "2018")
                         self.conn = sqlite3.connect(tempDB)
                         self.c = self.conn.cursor()
                         if(employee == 1):
@@ -105,7 +105,7 @@ class retrieveData:
                             all_data['Product'] = self.get_product_data()
                         self.final_data[temp_name] = all_data
 
-
+        pprint.pprint(self.final_data)
 
 
 
@@ -166,21 +166,28 @@ class retrieveData:
 
     #def get_product_data(self, productid, price):
     def get_product_data(self):
-        productlist = []
+        productlist = {}
         #if productid:
          #   productlist.append("ProductID")
         #if price:
          #   productlist.append("Price")
         #list_to_retrieve = ','.join(map(str, productlist[1:]))
         #self.c.execute("SELECT " + list_to_retrieve + " FROM Products")
-        self.c.execute("SELECT * FROM Products")
+
+        #self.conn.row_factory = lambda cursor, row: row[0]
+        #self.c = self.conn.cursor()
+
+        self.c.execute("SELECT productID,Price FROM Products")
         for row in self.c.fetchall():
-            #print(row)
-            productlist.append(row)
+            #print(row[1])
+            #productlist[row[0]] = row[1]
+            productlist.update({row[0]: row[1]})
+
         return productlist
 
 
-#get_some_data = retrieveData(["01-11-2018", "01-11-2018"], 1, 0, 0)
+get_some_data = retrieveData(["01-11-2018", "01-11-2018"], 0, 0, 1)
+
 #get_some_data.get_employee_data()
 #get_some_data.get_customer_data(1, 1, 1, 1, 0)
 #get_some_data.get_product_data(1,1)
