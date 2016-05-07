@@ -1,10 +1,19 @@
-__author__ = 'Brenden'
 import random
 import sqlite3
 
 class dataGeneration:
+    """
+    Generates weighted, random data for a database
+    """
 
     def __init__(self, database):
+        """
+        Creates public variables and calls respective functions
+
+        :param database: sqlite3 object
+        :return: none
+        """
+
         self.num_of_items = 100 # Has to be a 1 followed by 0's
         self.num_of_customers = 200
         self.num_of_employees = 50
@@ -40,10 +49,14 @@ class dataGeneration:
 
     # Generate a list of random product IDs
     def generateProducts(self):
+        """
+        Generate a dictionary of random product IDs and their prices
+        :return: none
+        """
 
-        # Creates X number of items in each category
+        # Creates items in each category
         for i in range(self.num_of_items):
-            self.ID_DICT[i+self.num_of_items] = random.randint(1, 10) # 1X
+            self.ID_DICT[i+self.num_of_items] = random.randint(1, 10)
             self.ID_DICT[i+self.num_of_items*2] = random.randint(1, 10)
             self.ID_DICT[i+self.num_of_items*3] = random.randint(1, 10)
             self.ID_DICT[i+self.num_of_items*4] = random.randint(1, 10)
@@ -53,12 +66,9 @@ class dataGeneration:
 
         # Sort for easy selection
         sorted(self.ID_DICT)
-        #print(self.ID_DICT)
 
         for product in self.ID_DICT.keys():
-
             temp_int = self.ID_DICT[product]
-            #print("The product ID is: " + str(product) + " and the price is: " + str(self.ID_DICT[product]))
             self.c.execute("INSERT INTO Products (ProductID, Price) VALUES (?, ?)", (product, self.ID_DICT[product]))
             self.conn.commit()
 
@@ -69,6 +79,19 @@ class dataGeneration:
 
 
     def generatePurchases(self, num_of_purchases, food, medical, electronics, outdoors, clothing, beauty, customer):
+        """
+        Given floats used for weighted choices, random purchases are made for a customer
+
+        :param num_of_purchases: int
+        :param food: float
+        :param medical: float
+        :param electronics: float
+        :param outdoors: float
+        :param clothing: float
+        :param beauty: float
+        :param customer: float
+        :return: none
+        """
 
         # Empty purchases
         self.customer_purchases = []
@@ -77,31 +100,24 @@ class dataGeneration:
         weighted_categories = [('Food', food), ('Medical', medical), ('Electronics', electronics), ('Outdoors', outdoors), ('Clothing', clothing), ('Beauty', beauty)]
         randomCategory = [val for val, cnt in weighted_categories for i in range(cnt)]
 
+        # Buy items
         for i in range(num_of_purchases):
-
             choice = random.choice(randomCategory)
-
             if choice == 'Food':
-
                 tempIndex = random.randint(self.num_of_items, self.num_of_items*2-1)
                 self.customer_purchases.append(tempIndex)
-
             elif choice == 'Medical':
                 tempIndex = random.randint(self.num_of_items*2, self.num_of_items*3-1)
                 self.customer_purchases.append(tempIndex)
-
             elif choice == 'Electronics':
                 tempIndex = random.randint(3*self.num_of_items, 4*self.num_of_items-1)
                 self.customer_purchases.append(tempIndex)
-
             elif choice == 'Outdoors':
                 tempIndex = random.randint(4*self.num_of_items, 5*self.num_of_items-1)
                 self.customer_purchases.append(tempIndex)
-
             elif choice == 'Clothing':
                 tempIndex = random.randint(5*self.num_of_items, 6*self.num_of_items-1)
                 self.customer_purchases.append(tempIndex)
-
             elif choice == 'Beauty':
                 tempIndex = random.randint(6*self.num_of_items, 7*self.num_of_items-1)
                 self.customer_purchases.append(tempIndex)
@@ -111,12 +127,18 @@ class dataGeneration:
 
 
     def generateEmployees(self):
+        """
+        Generate employees, each with a name, clock in, clock out, and wage
+
+        :return: none
+        """
 
         # Name
         maleNames = ['Perry Lovan', 'Horacio Arvidson', 'Gale Skipworth', 'Joshua Lodge', 'Noble Shutter', 'Kristopher Talor', 'Jarod Harrop', 'Joan Henrichs', 'Wilber Vitiello', 'Clayton Brannum', 'Joel Sennett', 'Wiley Maffei', 'Clemente Flore', 'Cliff Saari', 'Miquel Plamondon', 'Erwin Broadus', 'Elvin Defibaugh', 'Ramon Vaquera', 'Roberto Koval', 'Micah Sumter', 'Wyatt Cambareri', 'Jamal Delarosa', 'Franklyn Hayles', 'Riley Haslett', 'Robt Fincher', 'Abraham Denzer', 'Darius Jude', 'Phillip Sunderman', 'August Kindel', 'Jospeh Mawson', 'Damion Postma', 'Gregorio Pasco', 'Rosendo Downing', 'Chance Plascencia', 'Jewell Pankratz', 'Jerrell Tarrance', 'Michal Bliss', 'Josue Larocque', 'Aaron Harpster', 'Zack Hildebrant', 'Frank Souders', 'Lindsay Bechard', 'Agustin Marks', 'Mathew Fredericksen', 'Ivan Hanline', 'Michael Otto', 'Max Oberlander', 'Ricky Mckellar', 'Bernard Friedt', 'King Lorentzen']
         femaleNames = ['Lorretta Vansickle', 'Loura Steimle', 'Neomi Fritz', 'Vernie Vanderveen', 'Dede Poehler', 'Margarete Espinoza', 'Leda Leonardo', 'Fae Strand', 'Nichol Winford', 'Danika Ridgeway', 'Elvira Balentine', 'Sharell Xie', 'Sheree Booker', 'Emely Conine', 'Justina Kleve', 'Pia Maxton', 'Sophia Lark', 'Nilsa Albee', 'Felipa Seman', 'Jeraldine Watkins', 'Susann Sowards', 'Asha Irion', 'Shay Koran', 'Rosio Jahn', 'Rachal Slaven', 'Beryl Byron', 'Jona Lira', 'Margert Strite', 'Talia Beauregard', 'Jacqueline Vella', 'Rolande Mccready', 'Margret Hickerson', 'Precious Confer', 'Evita Nicolai', 'Fredda Groner', 'Laquanda Bracken', 'Alana Saddler', 'Melania Harring', 'Shae Everette', 'Marlyn Mcfalls', 'Madeline Nicols', 'Fonda Webster', 'Fumiko Steffy', 'Virginia Sprinkle', 'Lula Frisch', 'Mari Mulherin', 'Alecia Remillard', 'Jeanna Halderman', 'Ocie Waldrep', 'Theresa Knouse']
 
         for i in range(self.num_of_employees):
+
             # Clock in an hour before opening, 6 hours after, or 12 hours after
             clockIn = random.choice([7, 13, 19])
 
@@ -143,13 +165,13 @@ class dataGeneration:
                 print("Clock out:", clockOut)
                 print("Wage:", wage)
 
-            # Database.update clock in
-            # Database.update clock out
-            # Database.update wage
-            # Database.update name
 
-    # Customer data generation (weighted randoms = define our own trends without being obvious)
     def generateCustomers(self):
+        """
+        Customer data generation based on weighted random choices
+
+        :return: none
+        """
 
         # Counters
         shoppers = 0
@@ -374,6 +396,3 @@ class dataGeneration:
         if self.print_customers:
             print("\nRaw Customer Data: ")
             print(self.all_customers)
-
-#testrun = dataGeneration("BUSINESS_DATA.db")
-#testrun.generateProducts()

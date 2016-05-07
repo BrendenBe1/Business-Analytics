@@ -5,14 +5,24 @@ import dataAnalysis
 import createDashboard
 
 class GUI:
+    """
+    Allows for user input
+    """
+
     def __init__(self):
+        """
+        Creates TKinter window and waits for input
+
+        :return: none
+        """
+
         print("\n-----------------| GUI |-----------------\n")
 
         # Generate window
         self.root = Tk()
         self.root.title("Generate Graphs")
-        self.root.maxsize(160, 300)
-        self.root.minsize(160, 300)
+        self.root.maxsize(160, 250)
+        self.root.minsize(160, 250)
 
         # Variables
         self.current_year = str(datetime.datetime.now().year)
@@ -26,9 +36,7 @@ class GUI:
         self.b = IntVar()
         self.c = IntVar()
         self.d = IntVar()
-        self.e = IntVar()
-        self.f = IntVar()
-        self.graphs = [self.a, self.b, self.c, self.d, self.e, self.f]
+        self.graphs = [self.a, self.b, self.c, self.d]
         self.selected = [0, 0, 0, 0, 0, 0]
 
         # Entry variables
@@ -42,8 +50,6 @@ class GUI:
         self.graph_1 = ttk.Checkbutton(self.root, text="Paying Customers", variable=self.b, width=200).pack()
         self.graph_2 = ttk.Checkbutton(self.root, text="Customer statistics", variable=self.c, width=200).pack()
         self.graph_3 = ttk.Checkbutton(self.root, text="Revenue", variable=self.d, width=200).pack()
-        self.graph_4 = ttk.Checkbutton(self.root, text="Items sold", variable=self.e, width=200).pack()
-        self.graph_5 = ttk.Checkbutton(self.root, text="Extra statistics", variable=self.f, width=200).pack()
 
         # Entries
         self.date_photo = PhotoImage(file="date.gif")
@@ -56,7 +62,6 @@ class GUI:
 
         # Create button
         self.display = ttk.Button(self.root, text="Create", style="TButton", command=self.input_check).pack()
-        #self.display = Button(self.frame, text="Generate", command=self.generate_graphs).pack(anchor=W)
 
         print("> Successfully created GUI")
         print("> Waiting for input")
@@ -64,8 +69,13 @@ class GUI:
         self.root.mainloop()
 
 
-    # Check if user inputted all needed data and date is in correct format
     def input_check(self):
+        """
+        Check if user inputted all the required data and that it is in the correct format
+
+        :return: none
+        """
+
         # Parameters
         date = self.date_text.get()
         date2 = self.date_text2.get()
@@ -132,23 +142,35 @@ class GUI:
             if self.graphs[i].get() == 1:
                 self.selected[i] = 1
 
+        # Continue
         self.analyze_data(self.convert_date())
 
 
     def analyze_data(self, date_range):
+        """
+        Calls dataAnalysis class, retrieves the result, calls createDashboard class, then closes
+
+        :param date_range: list of two strings
+        :return: none
+        """
 
         print("> Analyzing data and generating graphs, please wait")
-
         URLs = dataAnalysis.dataAnalysis(date_range, self.selected).graph_URLs
         createDashboard.createDashboard(URLs, date_range)
 
-        # Close GUI after creation
+        # Close GUI after completion
         self.root.destroy()
         return
 
 
     # MM-DD, MM-DD to [MM-DD-YY, MM-DD-YY]
     def convert_date(self):
+        """
+        Converts data in the format (MM-DD, MM-DD) to (MM-DD-YY, MM-DD-YY)
+
+        :return: list of two strings
+        """
+
         date_range = []
         date = self.date_text.get()
         date2 = self.date_text2.get()

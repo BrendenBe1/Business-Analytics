@@ -1,13 +1,23 @@
-# Now, create a dashboard
 import requests, json
 
-# Takes in a list of string URLs, a string date, and a string time_type, and returns a link to the dashboard
 class createDashboard:
+    """
+    Combines graphs from Plotly API into a single webpage using Dashboardly
+    """
+
     def __init__(self, graph_URLs, date_range):
+        """
+        Generate needed data and create dashboard
+
+        :param graph_URLs: list of strings
+        :param date_range: list of two strings
+        :return: string of URL
+        """
+
         self.date_range = date_range
         self.graph_URLs = graph_URLs
 
-        # Order of graphs
+        # Reformat URLs into a list of dictionaries for the API
         self.rows_list = []
         for URL in graph_URLs:
             self.rows_list.append([{"plot_url" : URL}])
@@ -19,13 +29,24 @@ class createDashboard:
 
     # Convert "date" to "date (time_type)"
     def create_banner(self):
+        """
+        Combine two dates into a single string
+
+        :return: string
+        """
+
         self.banner_title += self.date_range[0]
         self.banner_title += " to "
         self.banner_title += self.date_range[1]
 
 
-    # Calls API to generate a link to the dashboard
     def generate(self):
+        """
+        Calls API to generate a link to the dashboard
+
+        :return: string
+        """
+
         dashboard_json = {
             "rows": self.rows_list,
             "banner": {
@@ -47,4 +68,4 @@ class createDashboard:
                                  headers={'content-type': 'application/x-www-form-urlencoded'})
         response.raise_for_status()
         dashboard_url = response.json()['url']
-        print('dashboard url: https://dashboards.ly{}'.format(dashboard_url))
+        print('Dashboard URL: https://dashboards.ly{}'.format(dashboard_url))
