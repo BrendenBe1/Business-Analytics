@@ -1,7 +1,9 @@
 import sqlite3
 import retrieveData
 import plotly.plotly as py
+import collections
 from plotly.graph_objs import *
+from random import randint
 
 ####################################
 # Grabs data from every field      #
@@ -26,10 +28,12 @@ class dataAnalysis:
         self.convert_date_range()
         self.database = retrieveData.retrieveData(date_range, 1, 1, 1).final_data
 
+        self.employee_hours_dict = {}
+        self.employee_pay_dict = {}
+        self.total_revenue = []
+
         # Selected graphs
         if selected[0]:
-            self.employee_hours_dict = {}
-            self.employee_pay_dict = {}
             self.employee_hours()
             self.employee_pay()
 
@@ -37,13 +41,15 @@ class dataAnalysis:
             self.paying = 0
             self.nonpaying = 0
             self.customer_ratio()
-            pass
 
         if selected[2]:
-          #  self.
-            pass
+            self.category_purchases = {'Food' : {"18-23" : 0, "24-29" : 0, "30-35" : 0, "36-41" : 0, "42-47" : 0, "48-53" : 0, "54-59" : 0, "60-65" : 0, "65+" : 0}, 'Electronics' : {"18-23" : 0, "24-29" : 0, "30-35" : 0, "36-41" : 0, "42-47" : 0, "48-53" : 0, "54-59" : 0, "60-65" : 0, "65+" : 0}, 'Outdoors' : {"18-23" : 0, "24-29" : 0, "30-35" : 0, "36-41" : 0, "42-47" : 0, "48-53" : 0, "54-59" : 0, "60-65" : 0, "65+" : 0}, 'Clothing' : {"18-23" : 0, "24-29" : 0, "30-35" : 0, "36-41" : 0, "42-47" : 0, "48-53" : 0, "54-59" : 0, "60-65" : 0, "65+" : 0}, 'Beauty' : {"18-23" : 0, "24-29" : 0, "30-35" : 0, "36-41" : 0, "42-47" : 0, "48-53" : 0, "54-59" : 0, "60-65" : 0, "65+" : 0}}
+            self.category_genders = {'Food' : {'M' : 0, 'F' : 0}, 'Electronics' : {'M' : 0, 'F' : 0}, 'Outdoors' : {'M' : 0, 'F' : 0}, 'Clothing' : {'M' : 0, 'F' : 0}, 'Beauty' : {'M' : 0, 'F' : 0}}
+            self.age_gender_paying()
 
         if selected[3]:
+
+            self.revenue()
             pass
 
         if selected[4]:
@@ -93,18 +99,13 @@ class dataAnalysis:
                     for k in range(1, days_in_month[(a - 1)] + 1):
                         temp_name = (str(a) + "-" + str(k) + "-" + "2016")
                         self.dates.append(temp_name)
-        #print("Dates:", self.dates)
 
 
     def employee_pay(self):
         print("> Analyzing Employee Pay...")
         print("     > Result: ", end='')
 
-        # Grab dictionary
-        for j in range(len(self.database[self.dates[0]]['Employee'])):
-            temp_employee = self.database[self.dates[0]]['Employee'][j]
-            pay = temp_employee[3]
-            self.employee_pay_dict[temp_employee[0]] = pay*self.employee_hours_dict[temp_employee[0]]
+        self.calculate_employee_pay()
 
         # Generate data points with above data struct
         graph_list = []
@@ -113,20 +114,15 @@ class dataAnalysis:
             tmp = Bar(x=data, y=self.employee_pay_dict[data], name=data)
             graph_list.append(tmp)
 
-        print(self.employee_pay_dict)
         # Make graph
         graph_data = Data(graph_list)
         graph_layout = Layout(barmode='stack', title="Employee Pay", xaxis=dict(title='Employee'), yaxis=dict(title='USD paid'))
         graph_fig = Figure(data=graph_data, layout=graph_layout)
-       # graph_uniqueURL = py.plot(graph_fig, filename='Employee-Pay')
-      #  self.graph_URLs.append(graph_uniqueURL)
+        graph_uniqueURL = py.plot(graph_fig, filename='Employee-Pay')
+        self.graph_URLs.append(graph_uniqueURL)
 
 
-    def employee_hours(self):
-
-        print("> Analyzing Employee Hours...")
-        print("     > Result: ", end='')
-
+    def calculate_employee_hours(self):
         for i in range(len(self.dates)):
             for j in range(len(self.database[self.dates[0]]['Employee'])):
                 temp_employee = self.database[self.dates[i]]['Employee'][j]
@@ -137,6 +133,23 @@ class dataAnalysis:
                 else:
                     self.employee_hours_dict[temp_employee[0]] += hours_worked
 
+
+    def calculate_employee_pay(self):
+
+        # Grab dictionary
+        for j in range(len(self.database[self.dates[0]]['Employee'])):
+            temp_employee = self.database[self.dates[0]]['Employee'][j]
+            pay = temp_employee[3]
+            self.employee_pay_dict[temp_employee[0]] = pay*self.employee_hours_dict[temp_employee[0]]
+
+
+    def employee_hours(self):
+
+        print("> Analyzing Employee Hours...")
+        print("     > Result: ", end='')
+
+        self.calculate_employee_hours()
+
         print(self.employee_hours_dict)
         graph_list = []
         for data in self.employee_hours_dict:
@@ -146,8 +159,8 @@ class dataAnalysis:
         graph_data = Data(graph_list)
         graph_layout = Layout(barmode='stack', title="Employee Hours", xaxis=dict(title='Employee'), yaxis=dict(title='Hours worked'))
         graph_fig = Figure(data=graph_data, layout=graph_layout)
-      #  graph_uniqueURL = py.plot(graph_fig, filename='Employee-Hours')
-      #  self.graph_URLs.append(graph_uniqueURL)
+        graph_uniqueURL = py.plot(graph_fig, filename='Employee-Hours')
+        self.graph_URLs.append(graph_uniqueURL)
 
 
     def customer_ratio(self):
@@ -178,27 +191,126 @@ class dataAnalysis:
 
 
     def age_gender_paying(self):
+
         for i in range(len(self.dates)):
             for j in range(len(self.database[self.dates[0]]['Customer'])):
 
                 # Analysis goes here
                 temp_customer = self.database[self.dates[i]]['Customer'][j]
+                temp_list = temp_customer[4].split(', ')
 
-                if temp_customer[4]:
-                    self.paying += 1
+                for purchaseID in temp_list:
+                    if purchaseID:
+                        category = int(purchaseID[0])
+                        if category == 1:
+                            key = 'Food'
+                        elif category == 2:
+                            key = 'Electronics'
+                        elif category == 3:
+                            key = 'Outdoors'
+                        elif category == 4:
+                            key = 'Clothing'
+                        elif category == 5:
+                            key = 'Beauty'
 
-        print(self.nonpaying)
+                        # Age : purchases
+                        self.category_purchases[key][self.convert_age_group(temp_customer[2])] += 1
+                        self.category_genders[key][temp_customer[3]] += 1
+
+        for category in self.category_purchases:
+            values = []
+            labels = []
+            for group in self.category_purchases[category]:
+                values.append(self.category_purchases[category][group])
+                labels.append(group)
+            print(values)
+            fig = {
+              'data': [{'labels': labels,
+              'values': values,
+              'type': 'pie'}],
+              'layout': {'title': category + ' purchases by age group'}
+                }
+            url = py.plot(fig)
+            self.graph_URLs.append(url)
+
         graph_list = []
-
-        tmp = Bar(x='Ratio', name='Paying', y=self.paying)
-        graph_list.append(tmp)
-
-        tmp = Bar(x='Ratio', name='Non-paying', y=self.nonpaying)
-        graph_list.append(tmp)
+        for category in self.category_genders:
+            tmp = Bar(x=category, name='Male', y=self.category_genders[category]['M'])
+            tmp2 = Bar(x=category, name='Female', y=self.category_genders[category]['F'])
+            graph_list.append(tmp)
+            graph_list.append(tmp2)
 
         graph_data = Data(graph_list)
-        graph_layout = Layout(barmode='stack', title="Paying and non-paying customers")
+        graph_layout = Layout(barmode='stack', title="Purchases by gender")
         graph_fig = Figure(data=graph_data, layout=graph_layout)
+
+        graph_uniqueURL = py.plot(graph_fig)
+        self.graph_URLs.append(graph_uniqueURL)
+
+    def convert_age_group(self, age):
+        if 18 <= age <= 23:
+            age_group = "18-23"
+        elif 24 <= age <= 29:
+            age_group = "24-29"
+        elif 30 <= age <= 35:
+            age_group = "30-35"
+        elif 36 <= age <= 41:
+            age_group = "36-41"
+        elif 42 <= age <= 47:
+            age_group = "42-47"
+        elif 48 <= age <= 53:
+            age_group = "48-53"
+        elif 54 <= age <= 59:
+            age_group = "54-59"
+        elif 60 <= age <= 65:
+            age_group = "60-65"
+        elif age > 65:
+            age_group = "65+"
+        return age_group
+
+
+    def revenue(self):
+        self.calculate_employee_hours()
+        self.calculate_employee_pay()
+        print(self.employee_hours_dict)
+        print(self.employee_pay_dict)
+
+        losses = 0
+
+        # Employee wage * hours
+        for employee in self.employee_hours_dict:
+            self.total_revenue.append(self.employee_hours_dict[employee] * self.employee_pay_dict[employee])
+
+        # Customer purchases
+        total_purchase_revenue = 0
+        for i in range(len(self.dates)):
+
+            # Current database doesn't account for losses (and doesn't have to in our scope), so this variable is a temporary placeholder to show graph
+            losses += randint(100, 1250)
+
+            for j in range(len(self.database[self.dates[0]]['Customer'])):
+
+                # Analysis goes here
+                temp_customer = self.database[self.dates[i]]['Customer'][j]
+                purchased_items = temp_customer[4].split(", ")
+                for item in purchased_items:
+                    try:
+                        total_purchase_revenue += self.database[self.dates[i]]['Product'][int(item)]
+                    except ValueError: # ['']
+                        pass
+
+            # Put everything here
+                    # each x is a date
+
+        self.total_revenue.append(total_purchase_revenue)
+        revenue = sum(self.total_revenue)
+        profit = revenue - losses
+
+       # profit_graph = Scatter(x = "Profit", y=profit, name="Profit"
+
+        print("The total revenue with no losses accounted for:", sum(self.total_revenue))
+
+
 
     # Age and Gender of paying customers per hour
         # DATA: CUSTOMER ALL
@@ -206,10 +318,6 @@ class dataAnalysis:
         # The number or percentage of age categories that are paying customers
             # Along with the number or percentage of each gender that are paying customer
 
-    # Purchases by category (age and gender)
-        # DATA: PRODUCTS
-        # Single graph or two graphs
-        # The number of purchases by category by both the age and gender of customers
 
     # Revenue
         # DATA: EMPLOYEES CLOCK IN / CLOCK OUT / WAGE

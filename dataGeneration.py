@@ -91,19 +91,19 @@ class dataGeneration:
                 self.customer_purchases.append(tempIndex)
 
             elif choice == 'Electronics':
-                tempIndex = random.randint(2*self.num_of_items, 3*self.num_of_items-1)
-                self.customer_purchases.append(tempIndex)
-
-            elif choice == 'Outdoors':
                 tempIndex = random.randint(3*self.num_of_items, 4*self.num_of_items-1)
                 self.customer_purchases.append(tempIndex)
 
-            elif choice == 'Clothing':
+            elif choice == 'Outdoors':
                 tempIndex = random.randint(4*self.num_of_items, 5*self.num_of_items-1)
                 self.customer_purchases.append(tempIndex)
 
-            elif choice == 'Beauty':
+            elif choice == 'Clothing':
                 tempIndex = random.randint(5*self.num_of_items, 6*self.num_of_items-1)
+                self.customer_purchases.append(tempIndex)
+
+            elif choice == 'Beauty':
+                tempIndex = random.randint(6*self.num_of_items, 7*self.num_of_items-1)
                 self.customer_purchases.append(tempIndex)
 
         if self.print_customers:
